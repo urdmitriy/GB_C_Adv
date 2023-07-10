@@ -1,71 +1,64 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include "LIB/test.h"
+#include <math.h>
 
-#define ARRAY_SIZE 10
+/*2. Создайте функцию которая считает корни квадратного уравнения (коэффициенты A,B,C просим ввести пользователя
+ * через scanf). Напишите вторую функцию, которая будет проверять корректность корней при разных коэффициентах.
+ * Постарайтесь учесть все варианты (когда корней нет, когда корень только один (одинаковые корни), когда корней два)
+3. Создайте библиотеку из тестирующей функции и/или функции замеряющей время.
+*/
 
-void Swap(int* a, int* b)
+
+void calculate(int a, int b, int c, answer_s *answer)
 {
-    int c = *a;
-    *a = *b;
-    *b = c;
-}
+    if (a==0) return;
+    int d = b * b - 4 * a *c;
 
-void Get_ptr_array(int * array, int ** array_ptr)
-{
-    for (int i = 0; i < ARRAY_SIZE; ++i) {
-        array_ptr[i] = array + i;
-        printf("Address element %d: %p, value: %d\n\r", i, array_ptr[i], *array_ptr[i]);
+    if (d>0)
+    {
+        answer->count_roots = 2;
+        answer->x1 = (-1 * b + sqrt(d)) / (2 * a);
+        answer->x2 = (-1 * b - sqrt(d)) / (2 * a);
+        return;
     }
-}
-
-void SortPointers(int** array_ptr)
-{
-    for (int i = 0; i < ARRAY_SIZE-1; ++i) {
-        for (int j = 0; j < ARRAY_SIZE-1; ++j) {
-            if (*array_ptr[j] > *array_ptr[j+1])
-            {
-                int* ptemp = array_ptr[j];
-                array_ptr[j] = array_ptr[j+1];
-                array_ptr[j+1] = ptemp;
-            }
-        }
+    else if (d == 0)
+    {
+        answer->count_roots = 1;
+        answer->x1 = (-1 * b) / (2 * a);
+        return;
+    }
+    else
+    {
+        answer->count_roots = 0;
+        return;
     }
 }
 
 int main() {
+    int a=0, b=0, c=0;
 
-    //===Задание 1===
+    printf("Enter a, b, c\n\r");
+    scanf("%d %d %d", &a, &b, &c);
 
-    int a = 10, b=20;
+    answer_s answer;
+    calculate(a, b, c, &answer);
 
-    printf("a=%d, b=%d\n\r", a, b);
-
-    Swap(&a, &b);
-
-    printf("a=%d, b=%d\n\r", a, b);
-
-    //===Задание 2===
-
-    int* array = malloc(sizeof (int) * ARRAY_SIZE);
-
-    for (int i = 0; i < ARRAY_SIZE; ++i) {
-        *(array+i) = ARRAY_SIZE - i;
+    if (answer.count_roots == 2)
+    {
+        printf("Answer: X1 = %0.2f, X2 = %0.2f\n\r", answer.x1, answer.x2);
     }
-    printf("\n\r");
-
-    int* array_ptr[ARRAY_SIZE];
-
-    Get_ptr_array(array, array_ptr);
-
-    //===Задание 3===
-
-    SortPointers(array_ptr);
-
-    printf("Sorted array:\n\r");
-
-    for (int i = 0; i < ARRAY_SIZE; ++i) {
-        printf("Address element %d: %p, value: %d\n\r", i, array_ptr[i], *array_ptr[i]);
+    else if (answer.count_roots == 1)
+    {
+        printf("Answer: X = %0.2f\n\r", answer.x1);
+        return 1;
     }
+    else
+    {
+        printf("Answer: No roots\n\r");
+        return 0;
+    }
+
+    test(calculate);
 
     return 0;
 }
