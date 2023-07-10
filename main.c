@@ -1,64 +1,61 @@
 #include <stdio.h>
-#include "LIB/test.h"
-#include <math.h>
+#include <inttypes.h>
 
-/*2. Создайте функцию которая считает корни квадратного уравнения (коэффициенты A,B,C просим ввести пользователя
- * через scanf). Напишите вторую функцию, которая будет проверять корректность корней при разных коэффициентах.
- * Постарайтесь учесть все варианты (когда корней нет, когда корень только один (одинаковые корни), когда корней два)
-3. Создайте библиотеку из тестирующей функции и/или функции замеряющей время.
-*/
+#define ARRAY_SIZE 32
 
+typedef struct pack_array {
+    uint32_t array[32]; // массив из 0 и 1
+    uint32_t count0 : 8; // количество 0 в массиве
+    uint32_t count1 : 8; // количество 1 в массиве
+}pack_array_s;
 
-void calculate(int a, int b, int c, answer_s *answer)
+void array2struct(int ar[], struct pack_array *ps)
 {
-    if (a==0) return;
-    int d = b * b - 4 * a *c;
-
-    if (d>0)
-    {
-        answer->count_roots = 2;
-        answer->x1 = (-1 * b + sqrt(d)) / (2 * a);
-        answer->x2 = (-1 * b - sqrt(d)) / (2 * a);
-        return;
-    }
-    else if (d == 0)
-    {
-        answer->count_roots = 1;
-        answer->x1 = (-1 * b) / (2 * a);
-        return;
-    }
-    else
-    {
-        answer->count_roots = 0;
-        return;
+    for (int i = 0; i < ARRAY_SIZE; ++i) {
+        if(ar[i]==0){
+            ps->count0++;
+        } else
+        {
+            ps->count1++;
+        }
+        ps->array[i] = ar[i];
     }
 }
 
+void struct2array(int ar[], struct pack_array *ps)
+{
+    for (int i = 0; i < ARRAY_SIZE; ++i) {
+        ar[i] =  ps->array[i];
+    }
+}
+
+int extractExp(float f) {
+    union {
+        float f;
+        struct {
+            uint32_t mantissa : 23;
+            uint32_t exp : 8;
+            uint32_t s : 1;
+        } field;
+    } fl;
+    fl.f = f;
+    return fl.field.exp;
+}
+
 int main() {
-    int a=0, b=0, c=0;
 
-    printf("Enter a, b, c\n\r");
-    scanf("%d %d %d", &a, &b, &c);
+    int arr[] = {1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,
+                     0,1,0,1,0,1,0,1,0,1,0,1,0,1,
+                     0,1,0};
+    pack_array_s pack_array;
 
-    answer_s answer;
-    calculate(a, b, c, &answer);
+    array2struct(arr, &pack_array);
 
-    if (answer.count_roots == 2)
-    {
-        printf("Answer: X1 = %0.2f, X2 = %0.2f\n\r", answer.x1, answer.x2);
-    }
-    else if (answer.count_roots == 1)
-    {
-        printf("Answer: X = %0.2f\n\r", answer.x1);
-        return 1;
-    }
-    else
-    {
-        printf("Answer: No roots\n\r");
-        return 0;
-    }
+    int arr_new[ARRAY_SIZE] = {0,};
 
-    test(calculate);
+    struct2array(arr_new,&pack_array);
+
+    int i = extractExp(1.4f);
 
     return 0;
 }
