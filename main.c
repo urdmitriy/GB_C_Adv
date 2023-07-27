@@ -62,7 +62,7 @@ int main() {
     find_intersection_point(-5, 0, 0.0001, f2, f3, 0.1, &data.point[4]);
 
     for (int i = 0; i < 5; ++i) {
-        printf("Point intersection #%d: \tx=%f,\ty=%f\n\r", i, data.point[i].x, data.point[i].y);
+        printf("Point intersection #%d: \tx=%f,\ty=%f\n\r", i+1, data.point[i].x, data.point[i].y);
     }
 
     return 0;
